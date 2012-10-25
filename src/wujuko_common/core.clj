@@ -17,3 +17,16 @@
               s
               (try (Integer/parseInt s) (catch Exception e d))))
 
+;;
+;; Taken from:
+;; Michal Marczyk's Solution:
+;; http://stackoverflow.com/questions/2640169/whats-the-easiest-way-to-parse-numbers-in-clojure
+(let [m (.getDeclaredMethod clojure.lang.LispReader
+                            "matchNumber"
+                            (into-array [String]))]
+  (.setAccessible m true)
+  (defn parse-number
+    "Use the Clojure number matcher to parse numbers."
+    [s]
+    (.invoke m clojure.lang.LispReader (into-array [s]))))
+
