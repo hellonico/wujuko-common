@@ -14,7 +14,7 @@
 (defn- reader
   "Fallback default reader if the stream isn't compressed."
   [filename]
-  (-> filename io/file io/input-stream io/reader))
+  (-> filename io/reader))
 
 ;;
 ;; Pass 'true' to GzipCompressorInputStream to tell it to handle
