@@ -30,3 +30,14 @@
     [s]
     (.invoke m clojure.lang.LispReader (into-array [s]))))
 
+
+(defn set-signal-handler!
+  "Sets the signal handler for various OS level signals that are sent to
+   the JVM. 'f' is a function taking one message parameter. 'sig' is the
+   signal to respond to, INT (ctrl-c), TERM (kill)"
+  [f sig]
+  (sun.misc.Signal/handle
+   (sun.misc.Signal. sig)
+   (proxy [sun.misc.SignalHandler] []
+     (handle [signal]
+       (f (str "-- caught signal " signal))))))
