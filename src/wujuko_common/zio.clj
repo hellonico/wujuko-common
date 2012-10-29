@@ -22,12 +22,12 @@
 (defn- gzip-reader
   "Correctly handles multi-member gzip files, default java gzip does not."
   [filename]
-  (-> filename io/file io/input-stream (GzipCompressorInputStream. true) io/reader))
+  (-> filename io/input-stream (GzipCompressorInputStream. true) io/reader))
 
 (defn- bzip2-reader
   "Reader for bzip2 files."
   [filename]
-  (-> filename io/file io/input-stream BZip2CompressorInputStream. io/reader))
+  (-> filename io/input-stream BZip2CompressorInputStream. io/reader))
 
 (defn- writer
   "Default writer if compressed output is not desired."
