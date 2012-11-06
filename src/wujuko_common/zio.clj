@@ -1,10 +1,11 @@
 (ns wujuko-common.zio
   (:require [clojure.java.io :as io])
-  (:import [java.io FileOutputStream PrintWriter]
+  (:import [java.io FileOutputStream PrintWriter SequenceInputStream]
            [org.apache.commons.compress.compressors.gzip
             GzipCompressorInputStream GzipCompressorOutputStream]
            [org.apache.commons.compress.compressors.bzip2
-            BZip2CompressorInputStream BZip2CompressorOutputStream]))
+            BZip2CompressorInputStream BZip2CompressorOutputStream]
+           [org.apache.commons.io FileUtils]))
 
 ;;
 ;; Use zreader and zwriter to obtain a reader or writer that is
@@ -22,12 +23,12 @@
 (defn- gzip-reader
   "Correctly handles multi-member gzip files, default java gzip does not."
   [filename]
-  (-> filename io/file io/input-stream (GzipCompressorInputStream. true) io/reader))
+  (-> filename io/input-stream (GzipCompressorInputStream. true) io/reader))
 
 (defn- bzip2-reader
   "Reader for bzip2 files."
   [filename]
-  (-> filename io/file io/input-stream BZip2CompressorInputStream. io/reader))
+  (-> filename io/input-stream BZip2CompressorInputStream. io/reader))
 
 (defn- writer
   "Default writer if compressed output is not desired."
@@ -60,3 +61,51 @@
     (.endsWith filename ".gz") (gzip-writer filename)
     (.endsWith filename ".bz2") (bzip2-writer filename)
     :else (writer filename)))
+
+;;
+;; Multiple files as Single Seq Stream
+
+(defn coll->enumeration
+  "Create an Enumeration from the provided collection."
+  [coll]
+  (clojure.lang.SeqEnumeration. coll))
+
+(defn wildcard-filter
+  "Given a regex, return a FilenameFilter that matches."
+  [re]
+  (reify java.io.FilenameFilter
+    (accept [_ dir name] (not (nil? (re-find re name))))))
+
+(defn directory-list
+  "Given a directory and a regex, return a sorted seq of matching filenames."
+  [dir re]
+  (sort (.list (clojure.java.io/file dir) (wildcard-filter re))))
+
+(defn match-multi-input-stream
+  "Find the files in *dir* that match the regular expression *regx* and return
+   a sequence of input streams."
+  [dir regx]
+  (map #(io/input-stream (str dir %)) (directory-list dir regx)))
+
+(defn matching-files-reader
+  "Given a directory and a regular expression, provides a reader that
+   treats all matching files as a single input stream.
+
+   (with-open [rdr (matching-files-reader \"/files/\" #\"*\\.txt\")]
+       ;; do something
+     )
+  "
+  [dir filere]
+  (io/reader
+   (SequenceInputStream.
+    (coll->enumeration (match-multi-input-stream dir filere)))))
+
+(defn move-file
+  "Uses apache commons io to move file. Exceptions thrown during fail."
+  [src dest]
+  (FileUtils/moveFile (io/file src) (io/file dest)))
+
+(defn move-to-dir
+  "Uses apache commons io to move file. Exceptions thrown during fail."
+  [src destdir]
+  (FileUtils/moveToDirectory (io/file src) (io/file destdir) false))
