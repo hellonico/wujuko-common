@@ -17,6 +17,13 @@
               s
               (try (Integer/parseInt s) (catch Exception e d))))
 
+(defn sorted-map-by-values
+  [m]
+  (into (sorted-map-by (fn [k1 k2]
+                         (compare [(get m k1) k1]
+                                  [(get m k2) k2])))
+        m))
+
 ;;
 ;; Taken from:
 ;; Michal Marczyk's Solution:
