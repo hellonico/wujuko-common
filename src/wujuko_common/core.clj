@@ -17,6 +17,18 @@
               s
               (try (Integer/parseInt s) (catch Exception e d))))
 
+(defn sorted-map-by-values
+  "Returns a map sorted by values given the input map.
+   'm' A map to sort.
+   Optional 'reverse': Boolean for reverse sorting order"
+  [m & [reverse]]
+  (into (sorted-map-by
+         (fn [k1 k2]
+           (let [cval (compare [(get m k1) k1]
+                               [(get m k2) k2])]
+             (if reverse (* -1 cval) cval))))
+        m))
+
 ;;
 ;; Taken from:
 ;; Michal Marczyk's Solution:

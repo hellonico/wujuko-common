@@ -1,4 +1,4 @@
-(defproject wujuko-common "0.1.2"
+(defproject wujuko-common "0.1.3"
   :description "A not so organized collection of utility functions."
   :url "http://damionjunk.com"
   :license {:name "Eclipse Public License"
@@ -9,5 +9,5 @@
                  [org.slf4j/slf4j-log4j12 "1.6.4"]
                  [org.apache.commons/commons-compress "1.4.1"]
                  [commons-io/commons-io "2.4"]
-                 [cheshire "4.0.2"]
-                 [clj-time "0.4.2"]])
+                 [cheshire "5.0.1"]
+                 [clj-time "0.4.4"]])
