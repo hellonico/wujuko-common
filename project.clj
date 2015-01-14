@@ -1,4 +1,4 @@
-(defproject wujuko-common "0.1.3"
+(defproject hellonico/wujuko-common "0.1.3"
   :description "A not so organized collection of utility functions."
   :url "http://damionjunk.com"
   :license {:name "Eclipse Public License"
